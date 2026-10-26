@@ -1,0 +1,32 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Heavy generated output videos & model weights
+outputs/*.mp4
+*.pt
+
+# Keep sample calibration frame in outputs
+!outputs/calibration_frame.jpg
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
