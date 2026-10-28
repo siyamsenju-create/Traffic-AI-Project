@@ -21,10 +21,22 @@ Traffic AI Project/
 │       └── traffic.mp4            # Sample traffic video input
 ├── outputs/
 │   ├── calibration_frame.jpg      # Extracted sample calibration frame
-│   └── tracked_traffic.mp4        # Generated tracked video (gitignored)
+│   ├── road_points.json           # Selected road coordinate points
+│   ├── road_points_preview.jpg    # Road boundary overlay preview
+│   ├── road_warp_preview.jpg      # Perspective warp preview
+│   ├── motion_observations.csv    # Frame-by-frame tracked motion data
+│   ├── motion_summary.csv         # Aggregated track displacement summary
+│   ├── motion_quality_summary.csv # Cleaned & filtered motion metrics
+│   ├── motion_analysis.mp4        # Annotated motion video (gitignored)
+│   └── tracked_traffic.mp4        # Detection tracking video (gitignored)
 ├── src/
 │   ├── extract_frame.py           # Calibration frame extractor
-│   └── vehicle_tracker.py         # Main YOLO11 + ByteTrack pipeline
+│   ├── vehicle_tracker.py         # Main YOLO11 + ByteTrack pipeline
+│   ├── select_road_points.py      # Interactive road point selector
+│   ├── preview_road_points.py     # Road points polygon visualizer
+│   ├── road_calibration.py        # Perspective transformation & warp
+│   ├── motion_analysis.py         # Motion analysis & displacement tracking
+│   └── clean_motion_report.py     # Noise filtering & motion quality report
 ├── tests/                         # Unit and integration tests
 ├── .gitignore
 ├── requirements.txt
@@ -54,28 +66,55 @@ pip install -r requirements.txt
 
 ---
 
-## 🚦 Usage
+## 🚦 Usage Workflow
 
 ### 1. Extract Calibration Frame
 Extracts a frame from the video (default: at 5.0 seconds) for camera calibration or ROI setup:
 ```bash
 python3 src/extract_frame.py
 ```
-*Output saved to:* `outputs/calibration_frame.jpg`
+*Output:* `outputs/calibration_frame.jpg`
 
-### 2. Run Vehicle Tracking Pipeline
+### 2. Select & Calibrate Road Region
+Select 4 corner points on the road to establish the perspective region:
+```bash
+# Interactive selection (GUI window)
+python3 src/select_road_points.py
+
+# Preview the selected polygon
+python3 src/preview_road_points.py
+
+# Generate perspective warp preview
+python3 src/road_calibration.py
+```
+*Outputs:* `outputs/road_points.json`, `outputs/road_points_preview.jpg`, `outputs/road_warp_preview.jpg`
+
+### 3. Vehicle Tracking Pipeline
 Runs object detection and ByteTrack tracking on `data/videos/traffic.mp4`:
 ```bash
 python3 src/vehicle_tracker.py
 ```
-*Model weights (`yolo11n.pt`) are downloaded automatically on the first run.*  
 *Output video saved to:* `outputs/tracked_traffic.mp4`
+
+### 4. Motion Analysis & Tracking
+Tracks bottom-center positions of vehicles across frames, recording pixel displacements and motion trajectories:
+```bash
+python3 src/motion_analysis.py
+```
+*Outputs:* `outputs/motion_analysis.mp4`, `outputs/motion_observations.csv`, `outputs/motion_summary.csv`
+
+### 5. Clean Motion & Quality Report
+Applies rolling median smoothing, filters out short flickers (< 1.0s), and flags outliers:
+```bash
+python3 src/clean_motion_report.py
+```
+*Output:* `outputs/motion_quality_summary.csv`
 
 ---
 
 ## ⚙️ Configuration
 
-Key parameters in `src/vehicle_tracker.py`:
+Key parameters:
 - `MODEL_NAME`: YOLO model weights (default: `yolo11n.pt`)
 - `CONFIDENCE_THRESHOLD`: Minimum detection confidence (default: `0.30`)
 - `IMAGE_SIZE`: Inference resolution (default: `640`)

@@ -1,0 +1,25 @@
+{
+  "image": "calibration_frame.jpg",
+  "image_width": 1920,
+  "image_height": 1080,
+  "points_xy_pixels": [
+    [
+      1119,
+      230
+    ],
+    [
+      1903,
+      226
+    ],
+    [
+      1832,
+      1057
+    ],
+    [
+      363,
+      1035
+    ]
+  ],
+  "real_world_coordinates_available": false,
+  "calibration_status": "UNVALIDATED"
+}
